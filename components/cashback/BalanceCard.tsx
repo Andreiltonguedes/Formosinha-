@@ -1,140 +1,81 @@
-import React, { useRef, useState } from "react";
-import {
-  View,
-  FlatList,
-  Dimensions,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-} from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 
-import WalletCard from "./WalletCard";
-import WalletIndicator from "./WalletIndicador";
+import { styles } from "../../styles/balanceCard.styles";
 
-const { width } = Dimensions.get("window");
+interface BalanceCardProps {
+  saldo: number;
+  cashbackMes: number;
+  pontos: number;
+}
 
-// largura do card
-const CARD_WIDTH = width * 0.9;
-
-// espaço entre cards
-const SPACING = 16;
-
-const wallets = [
-  {
-    id: 1,
-    nome: "Mercado",
-    saldo: 18.5,
-    cashback: "2%",
-    pontos: 420,
-    cor1: "#16A34A",
-    cor2: "#15803D",
-    icone: "cart",
-  },
-  {
-    id: 2,
-    nome: "Padaria",
-    saldo: 10.2,
-    cashback: "5%",
-    pontos: 220,
-    cor1: "#F97316",
-    cor2: "#EA580C",
-    icone: "bread-slice",
-  },
-  {
-    id: 3,
-    nome: "Farmácia",
-    saldo: 8.75,
-    cashback: "3%",
-    pontos: 180,
-    cor1: "#2563EB",
-    cor2: "#1D4ED8",
-    icone: "pill",
-  },
-  {
-    id: 4,
-    nome: "Posto",
-    saldo: 15,
-    cashback: "1,5%",
-    pontos: 300,
-    cor1: "#DC2626",
-    cor2: "#B91C1C",
-    icone: "gas-station",
-  },
-  {
-    id: 5,
-    nome: "Restaurante",
-    saldo: 6.3,
-    cashback: "4%",
-    pontos: 140,
-    cor1: "#9333EA",
-    cor2: "#7E22CE",
-    icone: "silverware-fork-knife",
-  },
-];
-
-export default function BalanceCarousel() {
-  const flatListRef = useRef<FlatList>(null);
-
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  function handleScroll(
-    event: NativeSyntheticEvent<NativeScrollEvent>
-  ) {
-    const index = Math.round(
-      event.nativeEvent.contentOffset.x /
-        (CARD_WIDTH + SPACING)
-    );
-
-    setActiveIndex(index);
-  }
+export default function BalanceCard({
+  saldo,
+  cashbackMes,
+  pontos,
+}: BalanceCardProps) {
+  const metaPontos = 500;
+  const progresso = Math.min((pontos / metaPontos) * 100, 100);
+  const faltam = Math.max(0, metaPontos - pontos);
 
   return (
-    <View>
+    <View style={styles.card}>
+      <View style={styles.header}>
+        <View style={styles.walletIcon}>
+          <MaterialCommunityIcons
+            name="wallet-outline"
+            size={30}
+            color="#FFF"
+          />
+        </View>
 
-      <FlatList
-        ref={flatListRef}
-        horizontal
-        data={wallets}
-        keyExtractor={(item) => item.id.toString()}
-        showsHorizontalScrollIndicator={false}
+        <View>
+          <Text style={styles.label}>Saldo disponível</Text>
+          <Text style={styles.value}>R$ {saldo.toFixed(2)}</Text>
+        </View>
+      </View>
 
-        snapToInterval={CARD_WIDTH + SPACING}
-        snapToAlignment="center"
-        decelerationRate="fast"
+      <Text style={styles.subtitle}>Seu cashback acumulado este mês</Text>
 
-        onMomentumScrollEnd={handleScroll}
+      <View style={styles.infoContainer}>
+        <View style={styles.infoCard}>
+          <MaterialCommunityIcons name="cash-fast" size={24} color="#FF8C00" />
+          <Text style={styles.infoTitle}>Cashback</Text>
+          <Text style={styles.infoValue}>R$ {cashbackMes.toFixed(2)}</Text>
+        </View>
 
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-        }}
+        <View style={styles.infoCard}>
+          <MaterialCommunityIcons name="star" size={24} color="#FF8C00" />
+          <Text style={styles.infoTitle}>Pontos</Text>
+          <Text style={styles.infoValue}>{pontos}</Text>
+        </View>
+      </View>
 
-        ItemSeparatorComponent={() => (
-          <View style={{ width: SPACING }} />
-        )}
+      <View style={styles.ruleBox}>
+        <MaterialCommunityIcons name="progress-check" size={22} color="#FFF" />
+        <Text style={styles.ruleText}>
+          Você está em <Text style={styles.bold}>{progresso.toFixed(0)}%</Text> da
+          meta de {metaPontos} pontos.
+        </Text>
+      </View>
 
-        renderItem={({ item }) => (
-          <View
-            style={{
-              width: CARD_WIDTH,
-            }}
-          >
-            <WalletCard
-              nome={item.nome}
-              saldo={item.saldo}
-              cashback={item.cashback}
-              pontos={item.pontos}
-              cor1={item.cor1}
-              cor2={item.cor2}
-              icone={item.icone}
-            />
-          </View>
-        )}
-      />
+      <View style={styles.buttons}>
+        <TouchableOpacity style={styles.primaryButton}>
+          <MaterialCommunityIcons name="cash-fast" size={20} color="#FF8C00" />
+          <Text style={styles.primaryButtonText}>Resgatar</Text>
+        </TouchableOpacity>
 
-      <WalletIndicator
-        total={wallets.length}
-        active={activeIndex}
-      />
+        <TouchableOpacity style={styles.secondaryButton}>
+          <MaterialCommunityIcons name="arrow-right" size={20} color="#FFF" />
+          <Text style={styles.secondaryButtonText}>Ver mais</Text>
+        </TouchableOpacity>
+      </View>
 
+      <View style={styles.expandButton}>
+        <Text style={styles.expandText}>Faltam {faltam} pontos</Text>
+        <MaterialCommunityIcons name="chevron-down" size={22} color="#FFF" />
+      </View>
     </View>
   );
 }

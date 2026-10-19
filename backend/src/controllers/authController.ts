@@ -7,14 +7,20 @@ export class AuthController {
 
   async login(req: Request, res: Response) {
     try {
-      const { email } = req.body;
+      const { email, identificador, senha } = req.body;
 
-      const usuario = await authService.login(email);
+      const usuario = await authService.login(identificador ?? email ?? "", senha);
 
-      res.status(200).json(usuario);
+      if (!usuario) {
+        return res.status(401).json({
+          message: "E-mail ou senha inválidos.",
+        });
+      }
+
+      return res.status(200).json(usuario);
 
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Erro ao realizar login.",
         error,
       });

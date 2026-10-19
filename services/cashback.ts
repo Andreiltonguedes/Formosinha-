@@ -1,22 +1,23 @@
-import { api } from "./api";
 import { API } from "../constants/api";
+import { api } from "./api";
 
 export const CashbackService = {
 
-  async listar() {
-    const response = await api.get(API.CASHBACK);
+  async listar(usuarioId: number) {
+    const response = await api.get(`${API.CASHBACK}/${usuarioId}`);
 
     return response.data;
   },
 
-  async historico() {
-    const response = await api.get(API.HISTORICO);
+  async historico(usuarioId: number) {
+    const response = await api.get(`${API.HISTORICO}/${usuarioId}`);
 
     return response.data;
   },
 
-  async resgatar(valor: number) {
+  async resgatar(usuarioId: number, valor: number) {
     const response = await api.post(API.RESGATAR, {
+      usuarioId,
       valor,
     });
 

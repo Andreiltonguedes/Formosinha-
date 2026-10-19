@@ -3,13 +3,28 @@ import { Usuario } from "../models/Usuario";
 
 export class AuthService {
 
-  async login(email: string) {
+  async login(identificador: string, senha: string) {
+    const valor = identificador.trim();
+    const email = valor.toLowerCase();
+    const cpf = valor.replace(/\D/g, "");
     const [rows] = await db.query(
-      "SELECT * FROM usuarios WHERE email = ?",
-      [email]
-    );
+      `SELECT * FROM usuarios
+       WHERE LOWER(email) = ?
+          OR REPLACE(REPLACE(REPLACE(cpf, '.', ''), '-', ''), ' ', '') = ?`,
+      [email, cpf]
+    ) as [any[], any];
 
-    return rows;
+    const usuario = Array.isArray(rows) ? rows[0] : null;
+
+    if (!usuario) {
+      return null;
+    }
+
+    if (usuario.senha !== senha) {
+      return null;
+    }
+
+    return usuario;
   }
 
   async cadastrar(usuario: Usuario) {
@@ -23,7 +38,7 @@ export class AuthService {
       usuario.nome,
       usuario.cpf,
       usuario.telefone,
-      usuario.email,
+      usuario.email.trim().toLowerCase(),
       usuario.senha,
       usuario.saldoCashback,
       usuario.ativo,

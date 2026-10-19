@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Alert,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity
 } from "react-native";
 
 import { router } from "expo-router";
+import { AuthService } from "../services/auth";
 import { styles } from "../styles/cadastro.styles";
 
 export default function Cadastro() {
@@ -22,7 +22,7 @@ export default function Cadastro() {
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
 
-  function cadastrar() {
+  async function cadastrar() {
     if (
       !nome ||
       !cpf ||
@@ -40,18 +40,22 @@ export default function Cadastro() {
       return;
     }
 
-    // Futuramente será enviado para a API
-    console.log({
-      nome,
-      cpf,
-      telefone,
-      email,
-      senha,
-    });
+    try {
+      await AuthService.cadastrar({
+        nome,
+        cpf,
+        telefone,
+        email,
+        senha,
+        saldoCashback: 0,
+        ativo: true,
+      });
 
-    Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
-
-    router.replace("/login");
+      Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
+      router.replace("/login");
+    } catch (error: any) {
+      Alert.alert("Erro", error?.response?.data?.message || "Não foi possível realizar o cadastro.");
+    }
   }
 
   return (

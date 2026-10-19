@@ -1,19 +1,17 @@
+import { Platform } from "react-native";
+
+const host = Platform.OS === "android" ? "10.0.2.2" : "localhost";
+
 export const API = {
-  BASE_URL: "http://192.168.0.10:3000",
+  BASE_URL: `http://${host}:3000/api`,
 
-  LOGIN: "/login",
+  LOGIN: "/auth/login",
+  CADASTRO: "/auth/cadastro",
+  RECUPERAR_SENHA: "/auth/recuperar-senha",
 
-  CADASTRO: "/cadastro",
-
-  RECUPERAR_SENHA: "/recuperar-senha",
-
-  USUARIO: "/usuario",
-
+  USUARIO: "/usuarios",
   EMPRESAS: "/empresas",
-
   CASHBACK: "/cashback",
-
   HISTORICO: "/historico",
-
-  RESGATAR: "/resgatar",
+  RESGATAR: "/resgates",
 };

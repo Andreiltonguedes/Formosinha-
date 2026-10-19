@@ -1,33 +1,41 @@
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    Text,
+    TextInput,
+    TouchableOpacity
 } from "react-native";
 
 import { router } from "expo-router";
+import { AuthService } from "../services/auth";
 import { styles } from "../styles/login.styles";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  function fazerLogin() {
+  async function fazerLogin() {
     if (!email || !senha) {
       Alert.alert("Atenção", "Preencha todos os campos.");
       return;
     }
 
-    // Aqui será feita a comunicação com o backend futuramente
-    console.log("Email:", email);
-    console.log("Senha:", senha);
+    try {
+      const usuario = await AuthService.login(email, senha);
 
-    router.replace("/cashback");
+      if (!usuario) {
+        Alert.alert("Erro", "E-mail ou senha inválidos.");
+        return;
+      }
+
+      Alert.alert("Sucesso", "Login realizado com sucesso!");
+      router.replace("/cashback");
+    } catch (error: any) {
+      Alert.alert("Erro", error?.response?.data?.message || "Não foi possível realizar o login.");
+    }
   }
 
   return (
